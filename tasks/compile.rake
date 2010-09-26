@@ -15,7 +15,8 @@ Rake::ExtensionTask.new("mysql2", gemspec) do |ext|
   # DRY options feed into compile or cross-compile process
   windows_options = [
     "--with-mysql-include=#{mysql_lib}/include",
-    "--with-mysql-lib=#{mysql_lib}/lib/opt"
+    "--with-mysql-lib=#{mysql_lib}/lib/opt",
+    '--enable-static'
   ]
 
   # automatically add build options to avoid need of manual input
