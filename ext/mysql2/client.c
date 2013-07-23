@@ -322,7 +322,7 @@ static VALUE rb_connect(VALUE self, VALUE user, VALUE pass, VALUE host, VALUE po
   args.unix_socket = NIL_P(socket) ? NULL : StringValuePtr(socket);
   args.port = NIL_P(port) ? args.port : NUM2INT(port);
   args.user = NIL_P(user) ? args.user : StringValuePtr(user);
-  args.passwd = NIL_P(pass) ? args.passwd : StringValuePtr(pass);
+  args.passwd = NIL_P(pass) ? NULL : StringValuePtr(pass);
   args.db = NIL_P(database) ? NULL : StringValuePtr(database);
   args.mysql = wrapper->client;
   args.client_flag = NUM2ULONG(flags);

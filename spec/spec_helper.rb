@@ -12,7 +12,7 @@ RSpec.configure do |config|
   end
 
   config.after :each do
-    @client.close
+    @client.close if @client
   end
 
   config.before(:all) do

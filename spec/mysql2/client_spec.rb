@@ -6,11 +6,11 @@ describe Mysql2::Client do
     let(:cnf_file) { File.expand_path('../../my.cnf', __FILE__) }
 
     it "without defaults group" do
-      @client = Mysql2::Client.new(defaults_file: cnf_file)
+      @client = Mysql2::Client.new(:defaults_file => cnf_file)
     end
 
     it "with defaults group" do
-      @client = Mysql2::Client.new(defaults_file: cnf_file, defaults_group: 'test')
+      @client = Mysql2::Client.new(:defaults_file => cnf_file, :defaults_group => 'test')
     end
 
     context "with invalid parameter defaults_file" do
@@ -18,16 +18,14 @@ describe Mysql2::Client do
 
       it "raises error" do
         lambda {
-          Mysql2::Client.new(defaults_file: invalid_cnf_file)
+          Mysql2::Client.new(:defaults_file => invalid_cnf_file)
         }.should raise_error(Mysql2::Error)
       end
     end
 
     context "with invalid parameter defaults_group" do
       it "raises error" do
-        lambda {
-          Mysql2::Client.new(defaults_file: cnf_file, defaults_group: 'invalid_group')
-        }.should raise_error(Mysql2::Error)
+        Mysql2::Client.new(:defaults_file => cnf_file, :defaults_group => 'invalid_group')
       end
     end
   end

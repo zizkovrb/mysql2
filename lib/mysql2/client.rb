@@ -54,8 +54,12 @@ module Mysql2
       database       = opts[:database] || opts[:dbname] || opts[:db]
       flags          = opts[:flags] ? opts[:flags] | @query_options[:connect_flags] : @query_options[:connect_flags]
       socket         = opts[:socket] || opts[:sock]
-      defaults_file  = opts[:defaults_file]
+      defaults_file  = opts[:defaults_file] || nil
       defaults_group = opts[:defaults_group] || "client"
+
+      if defaults_file and !File.exist?(defaults_file)
+        raise Mysql2::Error, "Defaults file doesn't exists."
+      end
 
       connect(user, pass, host, port, database, socket,
         flags, defaults_file, defaults_group)
