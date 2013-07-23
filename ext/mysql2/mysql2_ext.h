@@ -19,11 +19,13 @@ typedef unsigned int    uint;
 #include <mysql_com.h>
 #include <errmsg.h>
 #include <mysqld_error.h>
+#include <my_getopt.h>
 #else
 #include <mysql/mysql.h>
 #include <mysql/mysql_com.h>
 #include <mysql/errmsg.h>
 #include <mysql/mysqld_error.h>
+#include <mysql/my_getopt.h>
 #endif
 
 #ifdef HAVE_RUBY_ENCODING_H

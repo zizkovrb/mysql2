@@ -47,15 +47,18 @@ module Mysql2
         warn "============= END WARNING FROM mysql2 ========="
       end
 
-      user     = opts[:username] || opts[:user]
-      pass     = opts[:password] || opts[:pass]
-      host     = opts[:host] || opts[:hostname] || 'localhost'
-      port     = opts[:port] || 3306
-      database = opts[:database] || opts[:dbname] || opts[:db]
-      socket   = opts[:socket] || opts[:sock]
-      flags    = opts[:flags] ? opts[:flags] | @query_options[:connect_flags] : @query_options[:connect_flags]
+      user           = opts[:username] || opts[:user]
+      pass           = opts[:password] || opts[:pass]
+      host           = opts[:host] || opts[:hostname]
+      port           = opts[:port] || 3306
+      database       = opts[:database] || opts[:dbname] || opts[:db]
+      flags          = opts[:flags] ? opts[:flags] | @query_options[:connect_flags] : @query_options[:connect_flags]
+      socket         = opts[:socket] || opts[:sock]
+      defaults_file  = opts[:defaults_file]
+      defaults_group = opts[:defaults_group] || "client"
 
-      connect user, pass, host, port, database, socket, flags
+      connect(user, pass, host, port, database, socket,
+        flags, defaults_file, defaults_group)
     end
 
     def self.default_query_options

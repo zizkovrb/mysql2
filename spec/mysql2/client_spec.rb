@@ -2,6 +2,36 @@
 require 'spec_helper'
 
 describe Mysql2::Client do
+  context "using defaults file" do
+    let(:cnf_file) { File.expand_path('../../my.cnf', __FILE__) }
+
+    it "without defaults group" do
+      @client = Mysql2::Client.new(defaults_file: cnf_file)
+    end
+
+    it "with defaults group" do
+      @client = Mysql2::Client.new(defaults_file: cnf_file, defaults_group: 'test')
+    end
+
+    context "with invalid parameter defaults_file" do
+      let(:invalid_cnf_file) { File.expand_path('../../my/invalid/path.cnf', __FILE__) }
+
+      it "raises error" do
+        lambda {
+          Mysql2::Client.new(defaults_file: invalid_cnf_file)
+        }.should raise_error(Mysql2::Error)
+      end
+    end
+
+    context "with invalid parameter defaults_group" do
+      it "raises error" do
+        lambda {
+          Mysql2::Client.new(defaults_file: cnf_file, defaults_group: 'invalid_group')
+        }.should raise_error(Mysql2::Error)
+      end
+    end
+  end
+
   it "should raise an exception upon connection failure" do
     lambda {
       # The odd local host IP address forces the mysql client library to
@@ -37,7 +67,7 @@ describe Mysql2::Client do
       end
     end
     client = klient.new :flags => Mysql2::Client::FOUND_ROWS
-    (client.connect_args.last.last & Mysql2::Client::FOUND_ROWS).should be_true
+    (client.connect_args.last[6] & Mysql2::Client::FOUND_ROWS).should be_true
   end
 
   it "should default flags to (REMEMBER_OPTIONS, LONG_PASSWORD, LONG_FLAG, TRANSACTIONS, PROTOCOL_41, SECURE_CONNECTION)" do
@@ -49,12 +79,12 @@ describe Mysql2::Client do
       end
     end
     client = klient.new
-    (client.connect_args.last.last & (Mysql2::Client::REMEMBER_OPTIONS |
-                                     Mysql2::Client::LONG_PASSWORD |
-                                     Mysql2::Client::LONG_FLAG |
-                                     Mysql2::Client::TRANSACTIONS |
-                                     Mysql2::Client::PROTOCOL_41 |
-                                     Mysql2::Client::SECURE_CONNECTION)).should be_true
+    (client.connect_args.last[6] & (Mysql2::Client::REMEMBER_OPTIONS |
+                                    Mysql2::Client::LONG_PASSWORD |
+                                    Mysql2::Client::LONG_FLAG |
+                                    Mysql2::Client::TRANSACTIONS |
+                                    Mysql2::Client::PROTOCOL_41 |
+                                    Mysql2::Client::SECURE_CONNECTION)).should be_true
   end
 
   it "should have a global default_query_options hash" do

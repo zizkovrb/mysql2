@@ -1,0 +1,7 @@
+[client]
+password=localhost
+user=LOCALUSERNAME
+
+[test]
+host=localhost
+user=LOCALUSERNAME

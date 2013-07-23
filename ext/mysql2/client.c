@@ -278,16 +278,51 @@ static VALUE rb_mysql_info(VALUE self) {
   return rb_str;
 }
 
-static VALUE rb_connect(VALUE self, VALUE user, VALUE pass, VALUE host, VALUE port, VALUE database, VALUE socket, VALUE flags) {
+
+static VALUE rb_connect(VALUE self, VALUE user, VALUE pass, VALUE host, VALUE port, VALUE database, VALUE socket, VALUE flags, VALUE defaults_file, VALUE defaults_group) {
   struct nogvl_connect_args args;
   VALUE rv;
   GET_CLIENT(self);
 
-  args.host = NIL_P(host) ? "localhost" : StringValuePtr(host);
+  struct my_option my_opts[] = /* option information structures */
+  {
+    {"host", NULL, NULL,
+      &args.host, NULL, NULL,
+      GET_STR, REQUIRED_ARG, "localhost", 0, 0, 0, 0, 0},
+    {"password", NULL, NULL,
+      &args.passwd, NULL, NULL,
+      GET_STR, OPT_ARG, 0, 0, 0, 0, 0, 0},
+    {"port", NULL, NULL,
+      &args.port, NULL, NULL,
+      GET_UINT, REQUIRED_ARG, 3306, 0, 0, 0, 0, 0},
+    {"socket", NULL, NULL,
+      &args.unix_socket, NULL, NULL,
+      GET_STR, REQUIRED_ARG, 0, 0, 0, 0, 0, 0},
+    {"user", NULL, NULL,
+      &args.user, NULL, NULL,
+      GET_STR, REQUIRED_ARG, 0, 0, 0, 0, 0, 0},
+    { NULL, 0, NULL, NULL, NULL, NULL, GET_NO_ARG, NO_ARG, 0, 0, 0, 0, 0, 0 }
+  };
+
+  if(!NIL_P(defaults_file)) {
+    const char *groups[] = { StringValuePtr(defaults_group), NULL };
+    char * fake_argv[] = { "", NULL };
+    int    fake_argc   = 1;
+
+    if(load_defaults(StringValuePtr(defaults_file), groups, &fake_argc, (char ***)&fake_argv)) {
+      rb_raise(cMysql2Error, "Can't load defaults file. Invalid group or path?");
+    }
+
+    if(handle_options(&fake_argc, (char ***)&fake_argv, my_opts, NULL)) {
+      rb_raise(cMysql2Error, "Can't parse defaults file.");
+    }
+  }
+
+  args.host = NIL_P(host) ? args.host : StringValuePtr(host);
   args.unix_socket = NIL_P(socket) ? NULL : StringValuePtr(socket);
-  args.port = NIL_P(port) ? 3306 : NUM2INT(port);
-  args.user = NIL_P(user) ? NULL : StringValuePtr(user);
-  args.passwd = NIL_P(pass) ? NULL : StringValuePtr(pass);
+  args.port = NIL_P(port) ? args.port : NUM2INT(port);
+  args.user = NIL_P(user) ? args.user : StringValuePtr(user);
+  args.passwd = NIL_P(pass) ? args.passwd : StringValuePtr(pass);
   args.db = NIL_P(database) ? NULL : StringValuePtr(database);
   args.mysql = wrapper->client;
   args.client_flag = NUM2ULONG(flags);
@@ -1155,7 +1190,7 @@ void init_mysql2_client() {
   rb_define_private_method(cMysql2Client, "charset_name=", set_charset_name, 1);
   rb_define_private_method(cMysql2Client, "ssl_set", set_ssl_options, 5);
   rb_define_private_method(cMysql2Client, "initialize_ext", initialize_ext, 0);
-  rb_define_private_method(cMysql2Client, "connect", rb_connect, 7);
+  rb_define_private_method(cMysql2Client, "connect", rb_connect, 9);
 
   sym_id              = ID2SYM(rb_intern("id"));
   sym_version         = ID2SYM(rb_intern("version"));
