@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
 
   # tests
   s.add_development_dependency 'eventmachine'
-  s.add_development_dependency 'rake-compiler', '~> 0.8.1'
+  s.add_development_dependency 'rake-compiler', '~> 0.9.2'
   s.add_development_dependency 'rake', '~> 0.9.3'
   s.add_development_dependency 'rspec', '~> 2.8.0'
 end
