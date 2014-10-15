@@ -1380,6 +1380,11 @@ void init_mysql2_client() {
       LONG2NUM(CLIENT_SECURE_CONNECTION));
 #endif
 
+#ifdef CLIENT_RESERVED2
+  rb_const_set(cMysql2Client, rb_intern("SECURE_CONNECTION"),
+      LONG2NUM(CLIENT_RESERVED2));
+#endif
+
 #ifdef CLIENT_MULTI_STATEMENTS
   rb_const_set(cMysql2Client, rb_intern("MULTI_STATEMENTS"),
       LONG2NUM(CLIENT_MULTI_STATEMENTS));
